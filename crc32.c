@@ -5,7 +5,7 @@
 **Author:Wang Yaofu voipman@qq.com
 **Description: The source file of class crc32.
 */
-#include "stdlib.h"
+#include <stdlib.h>
 #include "crc32.h"
 static uint32_t crc32_tab[] =
 {
