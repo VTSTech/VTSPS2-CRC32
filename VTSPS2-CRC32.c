@@ -66,23 +66,33 @@ void file_crc32(char device[], char path[], char fn[])
   char tmp[32] = "";
   char f_crc32[16] = "";
   char full_path[256] = "";
-	strcpy(full_path,device);
-	strcat(full_path,path);
-	strcat(full_path,fn);  
+  //Build full_path string
+  strcpy(full_path,device);
+  strcat(full_path,path);
+  strcat(full_path,fn);
+	//8MB file buffer.
   char buf[8000000], *file = full_path;
-  fclose(fp);
+  //Close the file
+  fclose(fp);  
   if (NULL == (fp = fopen(file, "rb")))
   {
         printf("Error! Unable to open %s for reading\n", file);
         //return -1;
   }
+  //read file, store length in len, file contents in buf
   len = fread(buf, sizeof(char), sizeof(buf), fp);
   scr_printf("%d bytes read\n", len);
-  //scr_printf("The checksum of %s is:\n\n", file);
+  //Close the file
   fclose(fp);
   sleep(1);
+  //Use sprintf to store crc_32() return value in tmp
+  //  
+  //If file is larger than buffer, update_crc_32() will
+  //need to be looped to get large file CRC32
   sprintf(tmp,"%lX",crc_32(buf, len));
+  //We only need the last 8 bytes of crc_32 return value
   substring(tmp,f_crc32,9,8);
+  //Display CRC32
   scr_printf("CRC32: %s\n",f_crc32);
 }
 
