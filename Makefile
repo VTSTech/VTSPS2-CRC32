@@ -32,8 +32,7 @@ $(EE_BIN_STRIPPED): $(EE_BIN)
 	$(EE_STRIP) -o $@ $<
 	
 $(EE_BIN_PACKED): $(EE_BIN_STRIPPED)
-# Uncomment to enable ps2-packer compression.
-# Modify path /~/ps2homebrew/ps2-packer to match your environment
+# Uncomment to compress ELF. Adjust path to match your environment
 #	@echo "==================="
 #	@echo "=== Compressing ==="
 #	@echo "==================="

@@ -1,6 +1,8 @@
 // A simple homebrew to demonstrate CRC32 on the PS2
 // VTSPS2-CRC32 Written by VTSTech (veritas@vts-tech.org)
-
+// v0.2 2020-05-30 7:29:44 PM
+// Now using libcrc
+//
 // v0.1 2020-05-26 3:26:56 PM
 // First release
 
@@ -45,7 +47,7 @@ void InitPS2()
 }
 
 void banner(){
-	scr_printf("VTSPS2-CRC32 v0.1 by VTSTech (05.28.2020) \n");
+	scr_printf("VTSPS2-CRC32 v0.2 by VTSTech (05.30.2020) \n");
 	scr_printf("=======================www.vts-tech.org== \n \n");
 }
 void substring(char s[], char sub[], int p, int l) {
@@ -79,7 +81,7 @@ void file_crc32(char device[], char path[], char fn[])
   //scr_printf("The checksum of %s is:\n\n", file);
   fclose(fp);
   sleep(1);
-  sprintf(tmp,"%lX",crc32(buf, len));
+  sprintf(tmp,"%lX",crc_32(buf, len));
   substring(tmp,f_crc32,9,8);
   scr_printf("CRC32: %s\n",f_crc32);
 }
@@ -97,7 +99,7 @@ void str_crc32(char str[])
   scr_printf("%d bytes read\n", len);
   //scr_printf("The checksum of %s is:\n\n", file);
   sleep(1);
-  sprintf(tmp,"%lX",crc32(buf, strlen(full_str)));
+  sprintf(tmp,"%lX",crc_32(buf, strlen(full_str)));
   substring(tmp,f_crc32,9,8);
   scr_printf("CRC32: %s\n",f_crc32);
 }

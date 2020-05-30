@@ -13,4 +13,4 @@
 #include <iopcontrol.h>
 #include <iopheap.h>
 #include <inttypes.h>
-#include "crc32.h"
+#include "checksum.h"
