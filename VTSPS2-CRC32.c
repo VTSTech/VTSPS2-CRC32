@@ -70,7 +70,7 @@ void file_crc32(char device[], char path[], char fn[])
   strcpy(full_path,device);
   strcat(full_path,path);
   strcat(full_path,fn);
-	//8MB file buffer.
+  //8MB file buffer.
   char buf[8000000], *file = full_path;
   //Close the file
   fclose(fp);  
