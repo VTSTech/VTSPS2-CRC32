@@ -1,9 +1,11 @@
 // A simple homebrew to demonstrate CRC32 on the PS2
 // VTSPS2-CRC32 Written by VTSTech (veritas@vts-tech.org)
-// v0.2 2020-05-30 7:29:44 PM
+// v0.21 2020-10-12 6:29:33 AM
+// Now POSIX compliant
+// v0.2  2020-05-30 7:29:44 PM
 // Now using libcrc
 //
-// v0.1 2020-05-26 3:26:56 PM
+// v0.1  2020-05-26 3:26:56 PM
 // First release
 
 #include "VTSPS2-CRC32.h"
@@ -34,7 +36,7 @@ void InitPS2()
 	ResetIOP();
 	SifInitIopHeap();
 	SifLoadFileInit();
-	fioInit();
+	//fioInit();
 	//wipeUserMem();
 	sbv_patch_disable_prefix_check();
 	SifLoadModule("rom0:SIO2MAN", 0, NULL);
@@ -47,8 +49,8 @@ void InitPS2()
 }
 
 void banner(){
-	scr_printf("VTSPS2-CRC32 v0.2 by VTSTech (05.30.2020) \n");
-	scr_printf("=======================www.vts-tech.org== \n \n");
+	scr_printf("VTSPS2-CRC32 v0.21 by VTSTech (10.12.2020) \n");
+	scr_printf("========================www.vts-tech.org== \n \n");
 }
 void substring(char s[], char sub[], int p, int l) {
    int c = 0;
@@ -61,8 +63,9 @@ void substring(char s[], char sub[], int p, int l) {
 }
 void file_crc32(char device[], char path[], char fn[])
 {
-  FILE *fp;
-  size_t len;
+  //FILE *fp;
+  //int fp = 0;
+  //size_t len;
   char tmp[32] = "";
   char f_crc32[16] = "";
   char full_path[256] = "";
@@ -70,18 +73,25 @@ void file_crc32(char device[], char path[], char fn[])
   strcpy(full_path,device);
   strcat(full_path,path);
   strcat(full_path,fn);
-  //8MB file buffer.
-  char buf[8000000], *file = full_path;
+  //4MB file buffer.
+  char buf[4000000], *file = full_path;
   //Close the file
-  fclose(fp);  
-  if (NULL == (fp = fopen(file, "rb")))
+  //fclose(fp);  
+  FILE *fp = fopen(full_path, "r");
+  //scr_printf("DEBUG (fp): %d\n", fp);
+  sleep(1);
+  if (!fp)
   {
-        printf("Error! Unable to open %s for reading\n", file);
+        printf("Error! Unable to open %s for reading\n", full_path);
         //return -1;
   }
   //read file, store length in len, file contents in buf
-  len = fread(buf, sizeof(char), sizeof(buf), fp);
-  scr_printf("%d bytes read\n", len);
+  fseek(fp,0,SEEK_END);
+  long len = ftell(fp);
+  fseek(fp,0,SEEK_SET);
+  while((fread(buf, 1, len, fp)) > 0){
+  scr_printf("%lu bytes read\n", len);
+  }
   //Close the file
   fclose(fp);
   sleep(1);
@@ -89,7 +99,7 @@ void file_crc32(char device[], char path[], char fn[])
   //  
   //If file is larger than buffer, update_crc_32() will
   //need to be looped to get large file CRC32
-  sprintf(tmp,"%lX",crc_32(buf, len));
+  sprintf(tmp,"%lx", crc_32(buf, len));
   //We only need the last 8 bytes of crc_32 return value
   substring(tmp,f_crc32,9,8);
   //Display CRC32
@@ -109,7 +119,7 @@ void str_crc32(char str[])
   scr_printf("%d bytes read\n", len);
   //scr_printf("The checksum of %s is:\n\n", file);
   sleep(1);
-  sprintf(tmp,"%lX",crc_32(buf, strlen(full_str)));
+  sprintf(tmp,"%lx", crc_32(buf, strlen(full_str)));
   substring(tmp,f_crc32,9,8);
   scr_printf("CRC32: %s\n",f_crc32);
 }

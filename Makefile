@@ -33,10 +33,11 @@ $(EE_BIN_STRIPPED): $(EE_BIN)
 	
 $(EE_BIN_PACKED): $(EE_BIN_STRIPPED)
 # Uncomment to compress ELF. Adjust path to match your environment
-#	@echo "==================="
-#	@echo "=== Compressing ==="
-#	@echo "==================="
-#	~/ps2homebrew/ps2-packer/ps2-packer -v $< $@
+	@echo "==================="
+	@echo "=== Compressing ==="
+	@echo "==================="
+	ps2-packer -v $< $@
+	chmod +x $(EE_BIN_PACKED)
 	
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal
