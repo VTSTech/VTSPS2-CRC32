@@ -15,3 +15,10 @@
 #include <inttypes.h>
 #include <fcntl.h>
 #include "checksum.h"
+
+extern void usbd;
+extern void usbhdfsd;
+
+extern u32 size_usbd;
+extern u32 size_usbhdfsd;
+
