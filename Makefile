@@ -4,7 +4,7 @@ NAME = VTSPS2-CRC32
 EE_BIN = $(NAME).ELF
 EE_BIN_PACKED = $(NAME)-packed.ELF
 EE_BIN_STRIPPED = $(NAME)-stripped.ELF
-EE_OBJS = $(NAME).o crc32.o
+EE_OBJS = $(NAME).o crc32.o usbd.o usbhdfsd.o
 EE_LIBS = -lc -lpatches -ldebug
 
 all:
@@ -38,6 +38,13 @@ $(EE_BIN_PACKED): $(EE_BIN_STRIPPED)
 	@echo "==================="
 	ps2-packer -v $< $@
 	chmod +x $(EE_BIN_PACKED)
+
+#thx KrahJohlito
+usbd.s:
+	bin2s $(PS2SDK)/iop/irx/usbd.irx usbd.s usbd
+	
+usbhdfsd.s:
+	bin2s $(PS2SDK)/iop/irx/usbhdfsd.irx usbhdfsd.s usbhdfsd
 	
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal

@@ -1,6 +1,11 @@
 // A simple homebrew to demonstrate CRC32 on the PS2
 // VTSPS2-CRC32 Written by VTSTech (veritas@vts-tech.org)
 //
+// v0.23 2020-10-17 6:05:11 PM
+// Now handles any file size..
+// ..Including files too large
+// to fit in memory.
+//
 // v0.22 2020-10-15 9:03:22 AM
 // Now handles any file size
 //
@@ -69,7 +74,7 @@ void InitPS2()
 }
 
 void banner(){
-	scr_printf("VTSPS2-CRC32 v0.22 by VTSTech (10.15.2020) \n");
+	scr_printf(" \nVTSPS2-CRC32 v0.23 by VTSTech (10.17.2020) \n");
 	scr_printf("========================www.vts-tech.org== \n \n");
 }
 void substring(char s[], char sub[], int p, int l) {
@@ -84,39 +89,77 @@ void file_crc32(char device[], char path[], char fn[])
 {
   char tmp[32] = "";
   char f_crc32[16] = "";
+  uint32_t t_crc32 = 0xffffffffL;
   char full_path[256] = "";
+  int chunks_curr = 1;
+  int bytes_read;
   //Build full_path string
   strcpy(full_path,device);
   strcat(full_path,path);
   strcat(full_path,fn);
-  //Close the file
-  //fclose(fp);
   //scr_printf("DEBUG (full_path): %s\n", full_path);
-  FILE *fp = fopen(full_path, "r");
+  FILE *fp = fopen(full_path, "rb");
   sleep(1);
   if (!fp)
   {
-        printf("Error! Unable to open %s for reading\n", full_path);
+        scr_printf("Error! Unable to open %s for reading \n", full_path);
+	return;
   }
-  //read file, store length in len, file contents in buf
+  //read file, store length in len
   fseek(fp,0,SEEK_END);
   long len = ftell(fp);
+  long fsize = len;
   fseek(fp,0,SEEK_SET);
-  char buf[len];
-  while((fread(buf, 1, len, fp)) > 0){
-  scr_printf("%lu bytes read \n", len);
+  scr_printf("Filesize: %lu bytes \n", fsize);
+  //4MB File Buffer. If less than that read entire into buf
+  if (len <= 4194304) {
+	char buf[len];
+	while((fread(buf, 1, len, fp)) > 0){
+		scr_printf("%lu bytes read \n", len);
+	}
+	//Close the file
+	fclose(fp);
+	sleep(1);
+	//Use sprintf to store crc_32() return value in tmp
+	//If file is larger than buffer, update_crc_32() will
+	//need to be looped to get large file CRC32
+	sprintf(tmp,"%lx", crc_32(buf, len));
+  //4MB File Buffer. If more than that read byte by byte into ch
+  //Calling update_crc_32 and passing the old CRC32 and new byte each time.
+  } else {
+  	int chunks_left = len;
+	char buf[1];
+	int ch;
+	//scr_printf("Chunks Left: %d\n ", chunks_left);
+	ch=fgetc(fp);
+	t_crc32 = update_crc_32(t_crc32,(unsigned char) ch);
+	sprintf(tmp,"%lx", t_crc32);
+	//scr_printf("DEBUG: Initial Buffer read, CRC: %lx \n",tmp);
+	bytes_read = sizeof(buf);
+	while((ch=fgetc(fp)) != EOF){
+		t_crc32 = update_crc_32(t_crc32, (unsigned char) ch);
+		//if ((chunks_left - chunks_curr) <=4){
+		//	scr_printf("DEBUG: Current/Initial CRC: %lx/%lx \n", t_crc32,tmp);
+		//}
+		//sprintf(tmp,"%lx",t_crc32);
+		bytes_read++;
+		chunks_curr++;
+		//scr_printf("%d bytes read \n", bytes_read);
+	}
+	//Close the file.
+	fclose(fp);
+	sleep(1);
+	//crc lib requires this operation be preformed on final value
+	t_crc32 ^= 0xffffffffL;
+	//Copy the final CRC32 to tmp
+	sprintf(tmp,"%lx",t_crc32);
   }
-  //Close the file
-  fclose(fp);
-  sleep(1);
-  //Use sprintf to store crc_32() return value in tmp
-  //
-  //If file is larger than buffer, update_crc_32() will
-  //need to be looped to get large file CRC32
-  sprintf(tmp,"%lx", crc_32(buf, len));
+
   //scr_printf("Debug: %s\n", tmp);
   //We only need the last 8 bytes of crc_32 return value
-  //apparently only sometimes...
+  //Sometimes it is twice as long preceded by 0xffffffff
+  //copy processed value to f_crc32
+  //scr_printf("Debug (tmp): %lx \n", tmp);
   if (strlen(tmp)>=9){
     substring(tmp,f_crc32,9,8);
   } else if (strlen(tmp)<=7) {
@@ -190,24 +233,24 @@ int main()
 	//strcpy(full_path,device);
 	//strcat(full_path,path);
 	//strcat(full_path,fn);
-	scr_printf("%s \n",fn);
+	scr_printf("%s ",fn);
 	//scr_printf("(device): %s", device);
 	file_crc32(ldevice,path,fn);
-	//strcpy(fn,"2MB.BIN");
-	//scr_printf("%s\n ",fn);
-	//file_crc32(ldevice,path,fn);
-	//strcpy(fn,"4MB.BIN");
-	//scr_printf("%s\n ",fn);
-	//file_crc32(ldevice,path,fn);
-	//strcpy(fn,"8MB.BIN");
-	//scr_printf("%s\n ",fn);
-	//file_crc32(ldevice,path,fn);
-	//strcpy(fn,"16MB.BIN");
-	//scr_printf("%s\n ",fn);
-	//file_crc32(ldevice,path,fn);
-	//strcpy(fn,"32MB.BIN");
-	//scr_printf("%s\n ",fn);
-	//file_crc32(ldevice,path,fn);
+	strcpy(fn,"2MB.BIN");
+	scr_printf("%s ",fn);
+	file_crc32(ldevice,path,fn);
+	strcpy(fn,"4MB.BIN");
+	scr_printf("%s ",fn);
+	file_crc32(ldevice,path,fn);
+	strcpy(fn,"8MB.BIN");
+	scr_printf("%s ",fn);
+	file_crc32(ldevice,path,fn);
+	strcpy(fn,"16MB.BIN");
+	scr_printf("%s ",fn);
+	file_crc32(ldevice,path,fn);
+	strcpy(fn,"32MB.BIN");
+	scr_printf("%s ",fn);
+	file_crc32(ldevice,path,fn);
 	//strcpy(fn,"64MB.BIN");
 	//scr_printf("%s\n ",fn);
 	//file_crc32(ldevice,path,fn);
