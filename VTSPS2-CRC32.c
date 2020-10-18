@@ -85,7 +85,8 @@ void substring(char s[], char sub[], int p, int l) {
    }
    sub[c] = '\0';
 }
-void file_crc32(char device[], char path[], char fn[])
+
+char* file_crc32(char device[], char path[], char fn[])
 {
   char tmp[32] = "";
   char f_crc32[16] = "";
@@ -102,20 +103,20 @@ void file_crc32(char device[], char path[], char fn[])
   sleep(1);
   if (!fp)
   {
-        scr_printf("ERROR: Unable to open %s for reading \n", full_path);
-	return;
+        //scr_printf("ERROR: Unable to open %s for reading \n", full_path);
+	return("ERROR: Unable to open file for reading");
   }
   //read file, store length in len
   fseek(fp,0,SEEK_END);
   long len = ftell(fp);
-  long fsize = len;
+  //long fsize = len;
   fseek(fp,0,SEEK_SET);
-  scr_printf("Filesize: %lu bytes \n", fsize);
+  //scr_printf("Filesize: %lu bytes \n", fsize);
   //4MB File Buffer. If less than that read entire into buf
   if (len <= 4194304) {
 	char buf[len];
 	while((fread(buf, 1, len, fp)) > 0){
-		scr_printf("%lu bytes read \n", len);
+		//scr_printf("%lu bytes read \n", len);
 	}
 	//Close the file
 	fclose(fp);
@@ -183,10 +184,11 @@ void file_crc32(char device[], char path[], char fn[])
     substring(tmp,f_crc32,1,8);
   }
   //Display CRC32
-  scr_printf("CRC32: %s \n",f_crc32);
+  //scr_printf("CRC32: %s \n",f_crc32);
+  return(f_crc32);
 }
 
-void str_crc32(char str[])
+char* str_crc32(char str[])
 {
   size_t len;
   char tmp[32] = "";
@@ -201,8 +203,10 @@ void str_crc32(char str[])
   sleep(1);
   sprintf(tmp,"%lX", crc_32(buf, strlen(full_str)));
   substring(tmp,f_crc32,9,8);
-  scr_printf("CRC32: %s \n",f_crc32);
+  //scr_printf("CRC32: %s \n",f_crc32);
+  return(f_crc32);
 }
+
 int main()
 {
 	//int YCheck;
@@ -230,42 +234,38 @@ int main()
 	}
 	substring(full_path,path,(strlen(ldevice)+1),(strlen(full_path)-strlen(ldevice))+1);
 	strcpy(fn,"1MB.BIN");
-	//strcpy(full_path,device);
-	//strcat(full_path,path);
-	//strcat(full_path,fn);
 	scr_printf("%s ",fn);
-	//scr_printf("(device): %s", device);
-	file_crc32(ldevice,path,fn);
+	scr_printf("%s \n",file_crc32(ldevice,path,fn));
 	strcpy(fn,"2MB.BIN");
 	scr_printf("%s ",fn);
-	file_crc32(ldevice,path,fn);
+	scr_printf("%s \n",file_crc32(ldevice,path,fn));
 	strcpy(fn,"4MB.BIN");
 	scr_printf("%s ",fn);
-	file_crc32(ldevice,path,fn);
+	scr_printf("%s \n",file_crc32(ldevice,path,fn));
 	strcpy(fn,"8MB.BIN");
 	scr_printf("%s ",fn);
-	file_crc32(ldevice,path,fn);
+	scr_printf("%s \n",file_crc32(ldevice,path,fn));
 	strcpy(fn,"16MB.BIN");
 	scr_printf("%s ",fn);
-	file_crc32(ldevice,path,fn);
+	scr_printf("%s \n",file_crc32(ldevice,path,fn));
 	strcpy(fn,"32MB.BIN");
 	scr_printf("%s ",fn);
-	file_crc32(ldevice,path,fn);
+	scr_printf("%s \n",file_crc32(ldevice,path,fn));
 	strcpy(fn,"64MB.BIN");
 	scr_printf("%s ",fn);
-	file_crc32(ldevice,path,fn);
+	scr_printf("%s \n",file_crc32(ldevice,path,fn));
 	strcpy(fn,"128MB.BIN");
 	scr_printf("%s ",fn);
-	file_crc32(ldevice,path,fn);
+	scr_printf("%s \n",file_crc32(ldevice,path,fn));
 	strcpy(str," ");
-	scr_printf("Space: '%s' \n",str);
-	str_crc32(str);
+	scr_printf("Space: '%s' ",str);
+	scr_printf("CRC32: %s \n",str_crc32(str));
 	strcpy(str,"a string");
-	scr_printf("Text: '%s' \n",str);
-	str_crc32(str);
+	scr_printf("Text: '%s' ",str);
+	scr_printf("CRC32: %s \n",str_crc32(str));
 	strcpy(str,"147");
-	scr_printf("Number: '%s' \n",str);
-	str_crc32(str);
+	scr_printf("Number: '%s' ",str);
+	scr_printf("CRC32: %s \n",str_crc32(str));
 	scr_printf(" \n* All operations complete. Exit in 10s... \n");
 	sleep(10);
 	return 0;
