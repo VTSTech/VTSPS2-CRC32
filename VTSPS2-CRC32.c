@@ -46,14 +46,14 @@ void LoadModules(void)
 	ret = SifExecModuleBuffer(&usbd, size_usbd, 0, NULL, NULL);
 	if (ret < 0)
 	{
-		scr_printf(" Could not load usbd.irx! %d \n", ret);
+		scr_printf("Could not load usbd.irx! %d \n", ret);
 		//SleepThread();
 	}
 
 	ret = SifExecModuleBuffer(&usbhdfsd, size_usbhdfsd, 0, NULL, NULL);
 	if (ret < 0)
 	{
-		scr_printf(" Could not load usbhdfsd.irx! %d \n", ret);
+		scr_printf("Could not load usbhdfsd.irx! %d \n", ret);
 		//SleepThread();
 	}
 }
@@ -102,7 +102,7 @@ void file_crc32(char device[], char path[], char fn[])
   sleep(1);
   if (!fp)
   {
-        scr_printf("Error! Unable to open %s for reading \n", full_path);
+        scr_printf("ERROR: Unable to open %s for reading \n", full_path);
 	return;
   }
   //read file, store length in len
@@ -123,17 +123,17 @@ void file_crc32(char device[], char path[], char fn[])
 	//Use sprintf to store crc_32() return value in tmp
 	//If file is larger than buffer, update_crc_32() will
 	//need to be looped to get large file CRC32
-	sprintf(tmp,"%lx", crc_32(buf, len));
+	sprintf(tmp,"%lX", crc_32(buf, len));
   //4MB File Buffer. If more than that read byte by byte into ch
   //Calling update_crc_32 and passing the old CRC32 and new byte each time.
   } else {
-  	int chunks_left = len;
+  	//int chunks_left = len;
 	char buf[1];
 	int ch;
 	//scr_printf("Chunks Left: %d\n ", chunks_left);
 	ch=fgetc(fp);
 	t_crc32 = update_crc_32(t_crc32,(unsigned char) ch);
-	sprintf(tmp,"%lx", t_crc32);
+	sprintf(tmp,"%lX", t_crc32);
 	//scr_printf("DEBUG: Initial Buffer read, CRC: %lx \n",tmp);
 	bytes_read = sizeof(buf);
 	while((ch=fgetc(fp)) != EOF){
@@ -152,7 +152,7 @@ void file_crc32(char device[], char path[], char fn[])
 	//crc lib requires this operation be preformed on final value
 	t_crc32 ^= 0xffffffffL;
 	//Copy the final CRC32 to tmp
-	sprintf(tmp,"%lx",t_crc32);
+	sprintf(tmp,"%lX",t_crc32);
   }
 
   //scr_printf("Debug: %s\n", tmp);
@@ -199,7 +199,7 @@ void str_crc32(char str[])
   scr_printf("%d bytes read \n", len);
   //scr_printf("The checksum of %s is:\n\n", file);
   sleep(1);
-  sprintf(tmp,"%lx", crc_32(buf, strlen(full_str)));
+  sprintf(tmp,"%lX", crc_32(buf, strlen(full_str)));
   substring(tmp,f_crc32,9,8);
   scr_printf("CRC32: %s \n",f_crc32);
 }
@@ -208,11 +208,11 @@ int main()
 	//int YCheck;
 	char str[8000000];
 	char ldevice[256], path[256], fn[256], full_path[256];
-	char *tmp;
+	//char *tmp;
 	//uint32_t crc_32_val;
 	InitPS2();
 	WaitTime = Timer();
-	sleep(1);
+	//sleep(1);
 	banner();
 	//strcpy(device,"mc0:/");
 	//strcpy(path,"APPS/");
@@ -228,7 +228,7 @@ int main()
 	} else if (strstr(full_path,"mass0:")) {
 		strcpy(ldevice,"mass0:/");
 	}
-	substring(full_path,path,(strlen(ldevice)),(strlen(full_path)-strlen(ldevice))+1);
+	substring(full_path,path,(strlen(ldevice)+1),(strlen(full_path)-strlen(ldevice))+1);
 	strcpy(fn,"1MB.BIN");
 	//strcpy(full_path,device);
 	//strcat(full_path,path);
@@ -251,19 +251,19 @@ int main()
 	strcpy(fn,"32MB.BIN");
 	scr_printf("%s ",fn);
 	file_crc32(ldevice,path,fn);
-	//strcpy(fn,"64MB.BIN");
-	//scr_printf("%s\n ",fn);
-	//file_crc32(ldevice,path,fn);
-	//strcpy(fn,"128MB.BIN");
-	//scr_printf("%s\n ",fn);
-	//file_crc32(ldevice,path,fn);
+	strcpy(fn,"64MB.BIN");
+	scr_printf("%s ",fn);
+	file_crc32(ldevice,path,fn);
+	strcpy(fn,"128MB.BIN");
+	scr_printf("%s ",fn);
+	file_crc32(ldevice,path,fn);
 	strcpy(str," ");
 	scr_printf("'%s' \n",str);
 	str_crc32(str);
-	strcpy(str,"a string");
+	strcpy(str,"'a string'");
 	scr_printf("%s \n",str);
 	str_crc32(str);
-	strcpy(str,"147");
+	strcpy(str,"'147'");
 	scr_printf("%s \n",str);
 	str_crc32(str);
 	scr_printf(" \n* All operations complete. Exit in 10s... \n");
