@@ -7,8 +7,11 @@ An example CRC32 implementation for the PS2
 # file_crc32(char device[], char path[], char fn[])
 
 Expected param format
+
 device "mc0:/"
+
 path   "APPS/"
+
 fn     "FILE.EXT"
 
 <pre>
@@ -20,6 +23,7 @@ fn     "FILE.EXT"
 
 # str_crc32(char str[])
 Expected param format
+
 str    "any string"
 
 <pre>
