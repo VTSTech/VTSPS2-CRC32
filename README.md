@@ -4,7 +4,7 @@ An example CRC32 implementation for the PS2
 <img src="https://i.gyazo.com/90fcafc2333bc0be62128322d8cf9f51.png">
 
 # Usage:
-#file_crc32(char device[], char path[], char fn[])
+# file_crc32(char device[], char path[], char fn[])
 
 Expected param format
 device "mc0:/"
