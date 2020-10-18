@@ -258,13 +258,13 @@ int main()
 	scr_printf("%s ",fn);
 	file_crc32(ldevice,path,fn);
 	strcpy(str," ");
-	scr_printf("'%s' \n",str);
+	scr_printf("Space: '%s' \n",str);
 	str_crc32(str);
-	strcpy(str,"'a string'");
-	scr_printf("%s \n",str);
+	strcpy(str,"a string");
+	scr_printf("Text: '%s' \n",str);
 	str_crc32(str);
-	strcpy(str,"'147'");
-	scr_printf("%s \n",str);
+	strcpy(str,"147");
+	scr_printf("Number: '%s' \n",str);
 	str_crc32(str);
 	scr_printf(" \n* All operations complete. Exit in 10s... \n");
 	sleep(10);
