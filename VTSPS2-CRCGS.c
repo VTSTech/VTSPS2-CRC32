@@ -1,35 +1,4 @@
-// A simple homebrew to demonstrate CRC32 on the PS2
-// VTSPS2-CRC32 Written by VTSTech (veritas@vts-tech.org)
-//
-// v0.23 2020-10-17 6:05:11 PM
-// Now handles any file size..
-// ..Including files too large
-// to fit in memory.
-//
-// v0.22 2020-10-15 9:03:22 AM
-// Now handles any file size
-//
-// v0.21 2020-10-12 6:29:33 AM
-// Now POSIX compliant
-//
-// v0.2  2020-05-30 7:29:44 PM
-// Now using libcrc
-//
-// v0.1  2020-05-26 3:26:56 PM
-// First release
-
-#include "VTSPS2-CRC32.h"
-
-extern u64 WaitTime;
-extern u64 CurrTime;
-u64 WaitTime;
-u64 CurrTime;
-u64 init_delay_start;
-u64 timeout_start;
-u64 Timer(void)
-{
-	return (clock() / (CLOCKS_PER_SEC / 1000));
-}
+#include "VTSPS2-CRCGS.h"
 
 //thx sp193
 void ResetIOP()
@@ -38,24 +7,6 @@ void ResetIOP()
 	while(!SifIopReset("", 0)){};
 	while(!SifIopSync()){};
 	SifInitRpc(0);
-}
-
-void LoadModules(void)
-{
-	int ret;
-	ret = SifExecModuleBuffer(&usbd, size_usbd, 0, NULL, NULL);
-	if (ret < 0)
-	{
-		scr_printf("Could not load usbd.irx! %d \n", ret);
-		//SleepThread();
-	}
-
-	ret = SifExecModuleBuffer(&usbhdfsd, size_usbhdfsd, 0, NULL, NULL);
-	if (ret < 0)
-	{
-		scr_printf("Could not load usbhdfsd.irx! %d \n", ret);
-		//SleepThread();
-	}
 }
 
 void InitPS2()
@@ -69,14 +20,9 @@ void InitPS2()
 	SifLoadModule("rom0:MCMAN", 0, NULL);
 	SifLoadModule("rom0:MCSERV", 0, NULL);
 	SifLoadModule("rom0:PADMAN", 0, NULL);
-	LoadModules();
-	sleep(1);
+	//sleep(1);
 }
 
-void banner(){
-	scr_printf(" \nVTSPS2-CRC32 v0.23 by VTSTech (10.17.2020) \n");
-	scr_printf("========================www.vts-tech.org== \n \n");
-}
 void substring(char s[], char sub[], int p, int l) {
    int c = 0;
    while (c < l) {
@@ -149,7 +95,7 @@ char* file_crc32(char device[], char path[], char fn[])
 	}
 	//Close the file.
 	fclose(fp);
-	sleep(1);
+	//sleep(1);
 	//crc lib requires this operation be preformed on final value
 	t_crc32 ^= 0xffffffffL;
 	//Copy the final CRC32 to tmp
@@ -200,29 +146,71 @@ char* str_crc32(char str[])
   len = strlen(full_str);
   scr_printf("%d bytes read \n", len);
   //scr_printf("The checksum of %s is:\n\n", file);
-  sleep(1);
+  //sleep(1);
   sprintf(tmp,"%lX", crc_32(buf, strlen(full_str)));
   substring(tmp,f_crc32,9,8);
   //scr_printf("CRC32: %s \n",f_crc32);
   return(f_crc32);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-	//int YCheck;
-	char str[8000000];
-	char ldevice[256], path[256], fn[256], full_path[256];
-	//char *tmp;
-	//uint32_t crc_32_val;
 	InitPS2();
-	WaitTime = Timer();
-	//sleep(1);
-	banner();
-	//strcpy(device,"mc0:/");
-	//strcpy(path,"APPS/");
+
+	u64 White, Black, BlackFont, WhiteFont, RedFont, GreenFont, BlueFont, BlueTrans, RedTrans, GreenTrans, WhiteTrans;
+	u64 TealFont, YellowFont;
+
+	GSGLOBAL *gsGlobal = gsKit_init_global();
+	GSFONT *gsFont = gsKit_init_font(GSKIT_FTYPE_BMP_DAT, "mc0:/APPS/dejavu.bmp");
+
+	//char str[8000000];
+	char ldevice[256], path[256], fn[256], full_path[256];
 	getcwd(full_path,sizeof(full_path));
+
+	dmaKit_init(D_CTRL_RELE_OFF,D_CTRL_MFD_OFF, D_CTRL_STS_UNSPEC,
+		    D_CTRL_STD_OFF, D_CTRL_RCYC_8, 1 << DMA_CHANNEL_GIF);
+
+	// Initialize the DMAC
+	dmaKit_chan_init(DMA_CHANNEL_GIF);
+
+	Black = GS_SETREG_RGBAQ(0x00,0x00,0x00,0x00,0x00);
+	White = GS_SETREG_RGBAQ(0xFF,0xFF,0xFF,0x00,0x00);
+
+	WhiteFont = GS_SETREG_RGBAQ(0xFF,0xFF,0xFF,0x80,0x00);
+	BlackFont = GS_SETREG_RGBAQ(0x00,0x00,0x00,0x80,0x00);
+	RedFont = GS_SETREG_RGBAQ(0xFF,0x00,0x00,0x80,0x00);
+	GreenFont = GS_SETREG_RGBAQ(0x00,0xFF,0x00,0x80,0x00);
+	BlueFont = GS_SETREG_RGBAQ(0x00,0x00,0xFF,0x80,0x00);
+	TealFont = GS_SETREG_RGBAQ(0x00,0xFF,0xFF,0x80,0x00);
+	YellowFont = GS_SETREG_RGBAQ(0xFF,0xFF,0x00,0x80,0x00);
+
+	BlueTrans = GS_SETREG_RGBAQ(0x00,0x00,0xFF,0x40,0x00);
+	RedTrans = GS_SETREG_RGBAQ(0xFF,0x00,0x00,0x60,0x00);
+	GreenTrans = GS_SETREG_RGBAQ(0x00,0xFF,0x00,0x50,0x00);
+	WhiteTrans = GS_SETREG_RGBAQ(0xFF,0xFF,0xFF,0x50,0x00);
+
+	gsGlobal->PrimAlpha = GS_BLEND_FRONT2BACK;
+	gsGlobal->PSM = GS_PSM_CT16;
+	gsGlobal->PSMZ = GS_PSMZ_16;
+
+	gsKit_init_screen(gsGlobal);
+	gsKit_mode_switch(gsGlobal, GS_PERSISTENT);
+	gsKit_font_upload(gsGlobal, gsFont);
+	gsKit_clear(gsGlobal, Black);
+
+	//Line1, 10
+	//Line2, 27
+	//Line3, 44
+	//Line4, 61..
+	//78..95..112
+	gsKit_font_print(gsGlobal, gsFont, 10, 10, 1, TealFont, "VTSPS2-CRC32 v0.24 written by VTSTech\n=============www.VTS-Tech.org=\n");
+	//Line3...
+	//gsKit_font_print(gsGlobal, gsFont, 48, 48, 1, RedFont, "48x48");
+	//gsKit_font_print(gsGlobal, gsFont, 64, 64, 1, RedFont, "64x64");
+	//gsKit_font_print(gsGlobal, gsFont, 128, 128, 1, RedFont, "128x128");
+
 	if (strstr(full_path,"host:")) {
-		strcpy(ldevice,"host:/");
+		strcpy(ldevice,"mc0:/");
 	} else if (strstr(full_path,"mc0:")) {
 		strcpy(ldevice,"mc0:/");
 	} else if (strstr(full_path,"mc1:")) {
@@ -233,40 +221,72 @@ int main()
 		strcpy(ldevice,"mass0:/");
 	}
 	substring(full_path,path,(strlen(ldevice)+1),(strlen(full_path)-strlen(ldevice))+1);
+	if (strstr(full_path,"host:")){
+		strcpy(path,"APPS/");
+	}
 	strcpy(fn,"1MB.BIN");
-	scr_printf("%s ",fn);
-	scr_printf("%s \n",file_crc32(ldevice,path,fn));
+	char* fnl = "Filename: ";
+	char* str = "";
+	strcpy(str,fnl);
+	strcat(str,fn);
+	gsKit_font_print(gsGlobal, gsFont, 10, 78, 1, WhiteFont, str);
+	strcpy(str,file_crc32(ldevice,path,fn));
+	gsKit_font_print(gsGlobal, gsFont, 150, 78, 1, GreenFont, str);
+	gsKit_queue_exec(gsGlobal);
+	gsKit_sync_flip(gsGlobal);
+	strncpy(str,"",1);
 	strcpy(fn,"2MB.BIN");
-	scr_printf("%s ",fn);
-	scr_printf("%s \n",file_crc32(ldevice,path,fn));
-	strcpy(fn,"4MB.BIN");
-	scr_printf("%s ",fn);
-	scr_printf("%s \n",file_crc32(ldevice,path,fn));
-	strcpy(fn,"8MB.BIN");
-	scr_printf("%s ",fn);
-	scr_printf("%s \n",file_crc32(ldevice,path,fn));
-	strcpy(fn,"16MB.BIN");
-	scr_printf("%s ",fn);
-	scr_printf("%s \n",file_crc32(ldevice,path,fn));
-	strcpy(fn,"32MB.BIN");
-	scr_printf("%s ",fn);
-	scr_printf("%s \n",file_crc32(ldevice,path,fn));
-	strcpy(fn,"64MB.BIN");
-	scr_printf("%s ",fn);
-	scr_printf("%s \n",file_crc32(ldevice,path,fn));
-	strcpy(fn,"128MB.BIN");
-	scr_printf("%s ",fn);
-	scr_printf("%s \n",file_crc32(ldevice,path,fn));
-	strcpy(str," ");
-	scr_printf("Space: '%s' ",str);
-	scr_printf("CRC32: %s \n",str_crc32(str));
-	strcpy(str,"a string");
-	scr_printf("Text: '%s' ",str);
-	scr_printf("CRC32: %s \n",str_crc32(str));
-	strcpy(str,"147");
-	scr_printf("Number: '%s' ",str);
-	scr_printf("CRC32: %s \n",str_crc32(str));
-	scr_printf(" \n* All operations complete. Exit in 10s... \n");
-	sleep(10);
+	strcpy(str,"Filename: ");
+	strcpy(str,fnl);
+	strcat(str,fn);
+	gsKit_font_print(gsGlobal, gsFont, 10, 95, 1, WhiteFont, str);
+	strncpy(str,"",1);
+	strcpy(str,file_crc32(ldevice,path,fn));
+	gsKit_font_print(gsGlobal, gsFont, 150, 95, 1, GreenFont, str);
+	gsKit_queue_exec(gsGlobal);
+	gsKit_sync_flip(gsGlobal);
+	//str = str_crc32("a string");
+	//gsKit_font_print(gsGlobal, gsFont, 128, 112, 1, GreenFont, str);
+	gsKit_font_print(gsGlobal, gsFont, 10, 112, 1, WhiteFont, "String: ' '");
+	strcpy(str,str_crc32(" "));
+	gsKit_font_print(gsGlobal, gsFont, 150, 112, 1, GreenFont, str);
+	gsKit_queue_exec(gsGlobal);
+	gsKit_sync_flip(gsGlobal);
+	gsKit_font_print(gsGlobal, gsFont, 10, 129, 1, WhiteFont, "String: 'a string' ");
+	strcpy(str,str_crc32("a string"));
+	gsKit_font_print(gsGlobal, gsFont, 150, 129, 1, GreenFont, str);
+	gsKit_queue_exec(gsGlobal);
+	gsKit_sync_flip(gsGlobal);
+	gsKit_font_print(gsGlobal, gsFont, 10, 146, 1, WhiteFont, "String: '147' ");
+	strcpy(str,str_crc32("147"));
+	gsKit_font_print(gsGlobal, gsFont, 150, 146, 1, GreenFont, str);
+	gsKit_queue_exec(gsGlobal);
+	gsKit_sync_flip(gsGlobal);
+	//Line12...
+	//gsKit_font_print(gsGlobal, gsFont, 50, 80, 1, RedFont, "red");
+	//gsKit_font_print(gsGlobal, gsFont, 50, 110, 1, GreenFont, "green");
+	//gsKit_font_print(gsGlobal, gsFont, 50, 140, 1, BlueFont, "blue");
+
+	//gsKit_font_print_scaled(gsGlobal, gsFont, 400, 160, 2, 2.0f, BlueFont, "scaled 1\n"\
+	//                                                                       "scaled 2\n"\
+	//                                                                       "scaled 3\n");
+
+	//gsKit_font_print(gsGlobal, gsFont, 100, 200, 2, WhiteFont, "Testing 1\n"\
+	//			 				     "Testing 2\n"\
+	//						       	     "Testing 3\n"\
+	//						             "Testing 4\n"\
+	//		 					     "Testing 5\n"\
+	//							     "Testing 6\n"\
+	//							     "Testing 7\n"\
+	//							     "Testing 8\n"\
+	//							     "Testing 9\n"\
+	//							     "Testing 10\n");
+
+	while(1)
+	{
+		gsKit_queue_exec(gsGlobal);
+		gsKit_sync_flip(gsGlobal);
+	}
+
 	return 0;
 }
