@@ -45,6 +45,9 @@ usbd.s:
 	
 usbhdfsd.s:
 	bin2s $(PS2SDK)/iop/irx/usbhdfsd.irx usbhdfsd.s usbhdfsd
-	
+
+crc32: crc32.c crc.h
+	$(CC) $(CFLAGS) -o $@ $<
+		
 include $(PS2SDK)/samples/Makefile.pref
 include $(PS2SDK)/samples/Makefile.eeglobal
