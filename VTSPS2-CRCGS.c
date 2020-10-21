@@ -125,23 +125,23 @@ int main(int argc, char *argv[])
 	strncpy(str,"",1);
 	strcpy(str,file_crc32(ldevice,path,fn));
 	gsKit_font_print(gsGlobal, gsFont, 150, 61, 1, GreenFont, str);
-	//gsKit_queue_exec(gsGlobal);
-	//gsKit_sync_flip(gsGlobal);
+	gsKit_queue_exec(gsGlobal);
+	gsKit_sync_flip(gsGlobal);
 	gsKit_font_print(gsGlobal, gsFont, 10, 78, 1, WhiteFont, "String: ' '");
 	strcpy(str,str_crc32(" "));
 	gsKit_font_print(gsGlobal, gsFont, 150, 78, 1, GreenFont, str);
-	//gsKit_queue_exec(gsGlobal);
-	//gsKit_sync_flip(gsGlobal);
+	gsKit_queue_exec(gsGlobal);
+	gsKit_sync_flip(gsGlobal);
 	gsKit_font_print(gsGlobal, gsFont, 10, 95, 1, WhiteFont, "String: 'a string' ");
 	strcpy(str,str_crc32("a string"));
 	gsKit_font_print(gsGlobal, gsFont, 150, 95, 1, GreenFont, str);
-	//gsKit_queue_exec(gsGlobal);
-	//gsKit_sync_flip(gsGlobal);
+	gsKit_queue_exec(gsGlobal);
+	gsKit_sync_flip(gsGlobal);
 	gsKit_font_print(gsGlobal, gsFont, 10, 112, 1, WhiteFont, "String: '147' ");
 	strcpy(str,str_crc32("147"));
 	gsKit_font_print(gsGlobal, gsFont, 150, 112, 1, GreenFont, str);
-	//gsKit_queue_exec(gsGlobal);
-	//gsKit_sync_flip(gsGlobal);
+	gsKit_queue_exec(gsGlobal);
+	gsKit_sync_flip(gsGlobal);
 	//Line12...
 	//while(1)
 	//{

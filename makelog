@@ -1,3 +1,1 @@
-ee-gcc -D_EE -O2 -G0 -Wall   -I/usr/local/ps2dev/ps2sdk/ee/include -I/usr/local/ps2dev/ps2sdk/common/include -I/homebrew/gsKit/ee/dma/include -I/homebrew/gsKit/ee/gs/include -I/homebrew/gsKit/ee/gs/include -I/homebrew/gsKit/ee/dma/include -I/homebrew/gsKit/ee/toolkit/include -c VTSPS2-CRCGS.c -o VTSPS2-CRCGS.o
-ee-gcc -D_EE -O2 -G0 -Wall   -I/usr/local/ps2dev/ps2sdk/ee/include -I/usr/local/ps2dev/ps2sdk/common/include -I/homebrew/gsKit/ee/dma/include -I/homebrew/gsKit/ee/gs/include -I/homebrew/gsKit/ee/gs/include -I/homebrew/gsKit/ee/dma/include -I/homebrew/gsKit/ee/toolkit/include -c crc32.c -o crc32.o
-ee-gcc -L/homebrew/gsKit/lib -L/usr/local/ps2dev/ps2sdk/ee/lib -o VTSPS2-CRCGS.elf VTSPS2-CRCGS.o crc32.o -lc -ldebug -lpatches -Xlinker --start-group  -lgskit_toolkit -lgskit -ldmakit -Xlinker --end-group
+ee-gcc -c crc32.c -o crc32.o

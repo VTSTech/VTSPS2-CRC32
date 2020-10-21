@@ -50,8 +50,14 @@ EE_LIB_DIRS += -L$(GSKIT)/lib
 EE_LIB_DIRS += -L$(PS2SDK)/ee/lib
 EE_LDFLAGS += $(EE_LIB_DIRS)
 
+crc32.o: crc32.c checksum.h
+	ee-gcc -c $< -o $@
+
+VTSPS2-CRC32.o: VTSPS2-CRC32.c VTSPS2-CRCGS.h
+	ee-gcc $(EE_INCS) -c $< -o $@
+	
 all:
-	$(EE_BIN)
+	$(MAKE) $(EE_BIN)
 	ps2-packer -v $(EE_BIN) $(EE_BIN_PACKED)
 	chmod +x *.elf
 test: all
