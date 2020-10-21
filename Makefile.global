@@ -46,7 +46,7 @@ EE_INCS += -I$(GSKITSRC)/ee/gs/include -I$(GSKITSRC)/ee/dma/include
 EE_INCS += -I$(GSKITSRC)/ee/toolkit/include
 
 # linker flags
-EE_LIB_DIRS += -L$(GSKITSRC)/lib
+EE_LIB_DIRS += -L$(GSKIT)/lib
 EE_LIB_DIRS += -L$(PS2SDK)/ee/lib
 EE_LDFLAGS += $(EE_LIB_DIRS)
 
