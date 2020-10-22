@@ -13,5 +13,6 @@ EE_BIN  = VTSPS2-CRCGS.elf
 EE_BIN_PACKED = VTSPS2-CRCGS-packed.elf
 EE_OBJS = VTSPS2-CRCGS.o crc32.o VTSPS2-CRC32.o
 
+
 include Makefile.pref
 include Makefile.global
