@@ -1,7 +1,7 @@
-# VTSPS2-CRC32
+# libcrc for PS2 v0.24 by VTSTech
 An example CRC32 implementation for the PS2
 
-<img src="https://i.gyazo.com/cafcd4c147c2c52a9b8e863fe6789618.png">
+<img src="https://i.gyazo.com/0390b8a840ca63d952f7971cae086e93.png">
 
 # Usage:
 # file_crc32(char device[], char path[], char fn[])
