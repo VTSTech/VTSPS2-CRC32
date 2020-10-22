@@ -4,7 +4,8 @@ u64 White, Black, BlackFont, WhiteFont, RedFont, GreenFont, BlueFont, BlueTrans,
 u64 TealFont, YellowFont;
 
 GSGLOBAL *gsGlobal;
-GSFONT *gsFont;
+//GSFONT *gsFont;
+GSFONTM *gsFontM;
 
 //thx sp193
 void ResetIOP()
@@ -43,8 +44,9 @@ int main(int argc, char *argv[])
 	InitPS2();
 
 	gsGlobal = gsKit_init_global();
-	gsFont = gsKit_init_font(GSKIT_FTYPE_BMP_DAT, "mc0:/APPS/dejavu.bmp");
-
+	//gsFont = gsKit_init_font(GSKIT_FTYPE_BMP_DAT, "mc0:/APPS/dejavu.bmp");
+	gsFontM = gsKit_init_fontm();
+	
 	//char str[8000000];
 	char ldevice[256], path[256], fn[256], full_path[256];
 	getcwd(full_path,sizeof(full_path));
@@ -74,23 +76,39 @@ int main(int argc, char *argv[])
 	gsGlobal->PrimAlpha = GS_BLEND_FRONT2BACK;
 	gsGlobal->PSM = GS_PSM_CT16;
 	gsGlobal->PSMZ = GS_PSMZ_16;
-
+	gsGlobal->Width = 640;
+	// Buffer Init
+	gsGlobal->PrimAAEnable = GS_SETTING_ON;
+	gsGlobal->DoubleBuffering = GS_SETTING_OFF;
+	gsGlobal->ZBuffering      = GS_SETTING_OFF;	
+	gsFontM->Spacing = 0.95f;
+	int text_height,edge_size;
+	text_height = (26.0f * gsFontM->Spacing * 0.5f);
+	edge_size = text_height;
 	gsKit_init_screen(gsGlobal);
 	gsKit_mode_switch(gsGlobal, GS_PERSISTENT);
-	gsKit_font_upload(gsGlobal, gsFont);
+	//gsKit_font_upload(gsGlobal, gsFont);
+	gsKit_fontm_upload(gsGlobal, gsFontM);
 	gsKit_clear(gsGlobal, Black);
-
+	//Enable transparency
+	gsGlobal->PrimAlphaEnable = GS_SETTING_ON;
 	//Line1, 10
 	//Line2, 27
 	//Line3, 44
 	//Line4, 61..
 	//78..95..112
-	gsKit_font_print(gsGlobal, gsFont, 10, 10, 1, TealFont, "VTSPS2-CRC32 v0.24 written by VTSTech\n=============www.VTS-Tech.org=\n");
-	//Line3...
-	//gsKit_font_print(gsGlobal, gsFont, 48, 48, 1, RedFont, "48x48");
-	//gsKit_font_print(gsGlobal, gsFont, 64, 64, 1, RedFont, "64x64");
-	//gsKit_font_print(gsGlobal, gsFont, 128, 128, 1, RedFont, "128x128");
-
+	int rownumber = 0;
+	int rowoffset = 0;
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 10, 10, 1, 0.6f,TealFont, "libcrc for PS2 0.24 written by VTSTech\ncrc32 routines written by Lammert Bies\n=====================www.VTS-Tech.org=");
+	rownumber = 3;
+	char* str = "";
+	char* fnl = "Filename: ";
+	//gsKit_fontm_print_scaled(gsGlobal, gsFontM, col, row, layer, scale, RedFont, str);
+	//gsKit_fontm_print_scaled(gsGlobal, gsFontM, 48, 48, 1, 0.6f, RedFont, "48x48");
+	//gsKit_fontm_print_scaled(gsGlobal, gsFontM, 64, 64, 1, 0.6f, RedFont, "64x64");
+	//gsKit_fontm_print_scaled(gsGlobal, gsFontM, 128, 128, 1, 0.6f, RedFont, "128x1228");
+	gsKit_queue_exec(gsGlobal);
+	gsKit_sync_flip(gsGlobal);
 	if (strstr(full_path,"host:")) {
 		strcpy(ldevice,"mc0:/");
 	} else if (strstr(full_path,"mc0:")) {
@@ -106,49 +124,60 @@ int main(int argc, char *argv[])
 	if (strstr(full_path,"host:")){
 		strcpy(path,"APPS/");
 	}
+	rownumber++;
+	rowoffset = 10+(rownumber*17);	
+	strncpy(str,"",1);
 	strcpy(fn,"1MB.BIN");
-	char* fnl = "Filename: ";
-	char* str = "";
 	strcpy(str,fnl);
 	strcat(str,fn);
-	gsKit_font_print(gsGlobal, gsFont, 10, 44, 1, WhiteFont, str);
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 10, rowoffset, 1, 0.6f, WhiteFont, str);
 	strcpy(str,file_crc32(ldevice,path,fn));
-	gsKit_font_print(gsGlobal, gsFont, 150, 44, 1, GreenFont, str);
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 320, rowoffset, 1, 0.6f, GreenFont, str);
 	gsKit_queue_exec(gsGlobal);
 	gsKit_sync_flip(gsGlobal);
+	rownumber++;
+	rowoffset = 10+(rownumber*17);
 	strncpy(str,"",1);
 	strcpy(fn,"2MB.BIN");
 	strcpy(str,"Filename: ");
 	strcpy(str,fnl);
 	strcat(str,fn);
-	gsKit_font_print(gsGlobal, gsFont, 10, 61, 1, WhiteFont, str);
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 10, rowoffset, 1, 0.6f, WhiteFont, str);
 	strncpy(str,"",1);
 	strcpy(str,file_crc32(ldevice,path,fn));
-	gsKit_font_print(gsGlobal, gsFont, 150, 61, 1, GreenFont, str);
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 320, rowoffset, 1, 0.6f, GreenFont, str);
 	gsKit_queue_exec(gsGlobal);
 	gsKit_sync_flip(gsGlobal);
-	gsKit_font_print(gsGlobal, gsFont, 10, 78, 1, WhiteFont, "String: ' '");
+	rownumber++;
+	rowoffset = 10+(rownumber*17);	
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 10, rowoffset, 1, 0.6f, WhiteFont, "String: ' '");
 	strcpy(str,str_crc32(" "));
-	gsKit_font_print(gsGlobal, gsFont, 150, 78, 1, GreenFont, str);
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 320, rowoffset, 1, 0.6f, GreenFont, str);
 	gsKit_queue_exec(gsGlobal);
 	gsKit_sync_flip(gsGlobal);
-	gsKit_font_print(gsGlobal, gsFont, 10, 95, 1, WhiteFont, "String: 'a string' ");
+	rownumber++;
+	rowoffset = 10+(rownumber*17);	
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 10, rowoffset, 1, 0.6f, WhiteFont, "String: 'a string' ");
 	strcpy(str,str_crc32("a string"));
-	gsKit_font_print(gsGlobal, gsFont, 150, 95, 1, GreenFont, str);
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 320, rowoffset, 1, 0.6f, GreenFont, str);
 	gsKit_queue_exec(gsGlobal);
 	gsKit_sync_flip(gsGlobal);
-	gsKit_font_print(gsGlobal, gsFont, 10, 112, 1, WhiteFont, "String: '147' ");
+	rownumber++;
+	rowoffset = 10+(rownumber*17);	
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 10, rowoffset, 1, 0.6f, WhiteFont, "String: '147' ");
 	strcpy(str,str_crc32("147"));
-	gsKit_font_print(gsGlobal, gsFont, 150, 112, 1, GreenFont, str);
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 320, rowoffset, 1, 0.6f, GreenFont, str);
 	gsKit_queue_exec(gsGlobal);
 	gsKit_sync_flip(gsGlobal);
+	rownumber++;
+	rowoffset = 10+(rownumber*17);	
 	//Line12...
 	//while(1)
 	//{
 	//	gsKit_queue_exec(gsGlobal);
 	//	gsKit_sync_flip(gsGlobal);
 	//}
-	gsKit_font_print(gsGlobal, gsFont, 10, 129, 1, TealFont, "* All Done. Exit in 10s ...");
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 10, rowoffset, 1, 0.6f, TealFont, "* All Done. Exit in 10s ...");
 	gsKit_queue_exec(gsGlobal);
 	gsKit_sync_flip(gsGlobal);
 	sleep(10);

@@ -26,3 +26,5 @@
 //extern u32 size_usbd;
 //extern u32 size_usbhdfsd;
 
+char* file_crc32(char device[], char path[], char fn[]);
+char* str_crc32(char str[]);
