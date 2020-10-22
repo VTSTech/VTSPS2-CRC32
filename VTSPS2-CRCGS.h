@@ -1,3 +1,7 @@
+#include <gsKit.h>
+#include <dmaKit.h>
+#include <malloc.h>
+#include <gsToolkit.h>
 #include <debug.h>
 #include <unistd.h>
 #include <time.h>
@@ -16,9 +20,11 @@
 #include <fcntl.h>
 #include "checksum.h"
 
-extern void usbd;
-extern void usbhdfsd;
+//extern void usbd;
+//extern void usbhdfsd;
 
-extern u32 size_usbd;
-extern u32 size_usbhdfsd;
+//extern u32 size_usbd;
+//extern u32 size_usbhdfsd;
 
+char* file_crc32(char device[], char path[], char fn[]);
+char* str_crc32(char str[]);
