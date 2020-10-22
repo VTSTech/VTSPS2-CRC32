@@ -1,0 +1,1 @@
+ee-gcc -c crc32.c -o crc32.o
