@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 	//78..95..112
 	int rownumber = 0;
 	int rowoffset = 0;
-	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 10, 10, 1, 0.6f,TealFont, "libcrc for PS2 0.24 written by VTSTech\ncrc32 routines written by Lammert Bies\n=====================www.VTS-Tech.org=");
+	gsKit_fontm_print_scaled(gsGlobal, gsFontM, 10, 10, 1, 0.6f,TealFont, "libcrc for PS2 0.25 written by VTSTech\ncrc32 routines written by Lammert Bies\n=====================www.VTS-Tech.org=");
 	rownumber = 3;
 	char* str = "";
 	char* fnl = "Filename: ";

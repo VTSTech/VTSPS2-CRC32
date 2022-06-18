@@ -10,20 +10,17 @@
 #
 VERSION = 0.1
 NAME = VTSPS2-CRCGS
-EE_BIN = $(NAME).ELF
-EE_BIN_PACKED = $(NAME)-packed.ELF
-EE_BIN_STRIPPED = $(NAME)-stripped.ELF
-
-EE_OBJS = VTSPS2-CRCGS.o crc32.o VTSPS2-CRC32.o
+EE_BIN = $(NAME).elf
+EE_BIN_PACKED = $(NAME)-packed.elf
+EE_BIN_STRIPPED = $(NAME)-stripped.elf
 
 EE_LIBS += -lc -ldebug -lpatches -lgskit_toolkit -lgskit -ldmakit
-
 EE_INCS += -I$(GSKIT)/include -I$(GSKIT)/ee/dma/include -I$(GSKIT)/ee/gs/include -I$(GSKIT)/ee/toolkit/include
-# linker flags
 EE_LIB_DIRS += -L$(GSKIT)/lib
 EE_LIB_DIRS += -L$(PS2SDK)/ee/lib
-EE_LDFLAGS += -Wl,--allow-multiple-definition $(EE_LIB_DIRS)
-EE_CFLAGS += -Wno-pointer-sign -Wno-implicit-function-declaration -Wno-strict-aliasing -Wno-format-overflow -Wno-format-truncation
+EE_LDFLAGS += $(EE_LIB_DIRS)
+EE_OBJS = VTSPS2-CRCGS.o crc32.o VTSPS2-CRC32.o
+
 all:
 	@echo "======================================="
 	@echo "=== Building $(NAME) v$(VERSION) ==="
