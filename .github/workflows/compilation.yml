@@ -30,7 +30,7 @@ jobs:
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
-        name: HomeBrewDownloader-${{ steps.slug.outputs.sha8 }}
+        name: VTSPS2-CRC32-${{ steps.slug.outputs.sha8 }}
         path: VTSPS2-CRCGS-packed.elf
 
     - name: Create release
